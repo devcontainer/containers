@@ -1,0 +1,53 @@
+version: "3.6"
+services:
+  zookeeper:
+    image: debezium/zookeeper:${DEBEZIUM_VERSION:-0.8}
+    hostname: zookeeper
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+
+  kafka:
+    # image: wurstmeister/kafka:latest
+    image: debezium/kafka:${DEBEZIUM_VERSION:-0.8}
+    ports:
+      - target: 9092
+        published: 9092
+    depends_on:
+      - zookeeper
+    env_file:
+      - ../environment/kafka/.default.env
+      - ../environment/kafka/.${ENV}.env
+
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-9.6}
+    ports:
+      - 5432:5432
+    env_file:
+      - ../environment/postgres/.default.env
+      - ../environment/postgres/.${ENV}.env
+
+  connect:
+    image: debezium/connect:${DEBEZIUM_VERSION:-0.8}
+    ports:
+      - 8083:8083
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      KAFKA_PORT_9092_TCP: 9092
+    env_file:
+      - ../environment/debezium-connect/.default.env
+      - ../environment/debezium-connect/.${ENV}.env
+
+  sbx:
+    container_name: sbx
+    image: ashtr/fe-devbox:carbon-alpine
+    command: tail -f /dev/null
+    env_file:
+      - ../environment/docker/.default.env
+      - ../environment/docker/.${ENV}.env
+    volumes:
+      - ../:${APP_DIR}
+    working_dir: ${APP_DIR}
