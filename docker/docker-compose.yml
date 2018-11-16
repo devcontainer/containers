@@ -11,6 +11,8 @@ services:
   kafka:
     # image: wurstmeister/kafka:latest
     image: debezium/kafka:${DEBEZIUM_VERSION:-0.8}
+#    hostname: kafka
+#    container_name: kafka
     ports:
       - target: 9092
         published: 9092
@@ -51,3 +53,15 @@ services:
     volumes:
       - ../:${APP_DIR}
     working_dir: ${APP_DIR}
+
+  dap-spring:
+    container_name: dap-spring
+    image: maven:3.5.2-jdk-8-slim
+    command: >
+      sh -c "ls; mvn clean install; mvn spring-boot:run"
+    volumes:
+    - ${HOME}/Spring-Kafka-ProducerConsumer:/usr/src/app
+    - ${HOME}/.m2:/root/.m2
+    working_dir: /usr/src/app
+    depends_on:
+    - kafka

@@ -1,16 +1,18 @@
 {
   "name": "inventory-connector",
   "config": {
-    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-    "tasks.max": "1",
-    "database.hostname": "postgres",
-    "database.port": "5432",
-    "database.user": "postgres",
-    "database.password": "postgres",
-    "database.dbname": "postgres",
-    "database.server.name": "dbserver1",
-    "database.whitelist": "inventory",
-    "database.history.kafka.bootstrap.servers": "kafka:9092",
-    "database.history.kafka.topic": "schema-changes.inventory"
-  }
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "tasks.max": "1",
+        "plugin.name": "wal2json",
+        "database.hostname": "host.docker.internal",
+        "database.port": "5432",
+        "database.user": "a212687504",
+        "database.password": "postgres",
+        "database.dbname": "postgres",
+        "database.server.name": "dbserver1",
+        "database.whitelist": "postgres",
+        "database.history.kafka.bootstrap.servers": "kafka:9092",
+        "database.history.kafka.topic": "schema-changes.postgres",
+        "name": "dap-connector"
+}
 }
