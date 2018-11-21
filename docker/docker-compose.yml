@@ -1,6 +1,6 @@
 version: "3.6"
 volumes:
-  dap-postgres: {}
+  dap-postgres:
 services:
   zookeeper:
     image: debezium/zookeeper:${DEBEZIUM_VERSION:-0.8}
