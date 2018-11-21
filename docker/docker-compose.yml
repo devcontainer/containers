@@ -40,6 +40,11 @@ services:
       - ../scripts/postgres.alter-role-set-search-path.sql:/docker-entrypoint-initdb.d/00-ALTER-ROLE-SET-SEARCH-PATH.sql
       - dap-postgres:/var/lib/postgresql/data
 
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+
   connect:
     image: debezium/connect:${DEBEZIUM_VERSION:-0.8}
     hostname: connect
@@ -91,15 +96,14 @@ services:
     volumes:
       - ../:${APP_DIR}
     working_dir: ${APP_DIR}
-
-  dap-spring:
-    container_name: dap-spring
-    image: maven:3.5.2-jdk-8-slim
-    command: >
-      sh -c "ls; mvn clean install; mvn spring-boot:run"
-    volumes:
-      - ${HOME}/Spring-Kafka-ProducerConsumer:/usr/src/app
-      - ${HOME}/.m2:/root/.m2
-    working_dir: /usr/src/app
-    depends_on:
-      - kafka
+  # dap-spring:
+  #   container_name: dap-spring
+  #   image: maven:3.5.2-jdk-8-slim
+  #   command: >
+  #     sh -c "ls; mvn clean install; mvn spring-boot:run"
+  #   volumes:
+  #     - ${HOME}/Spring-Kafka-ProducerConsumer:/usr/src/app
+  #     - ${HOME}/.m2:/root/.m2
+  #   working_dir: /usr/src/app
+  #   depends_on:
+  #     - kafka
