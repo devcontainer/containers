@@ -110,3 +110,20 @@ services:
   #   working_dir: /usr/src/app
   #   depends_on:
   #     - kafka
+
+
+  dap-notification-service:
+    container_name: dap-notification-service
+    image: maven:3.5.2-jdk-8-slim
+    command: >
+      sh -c "ls;mvn spring-boot:run"
+    env_file:
+    - ../environment/dap-notification-service/.default.env
+    volumes:
+    - ${HOME}/coding/project_dap/dap-notification-service-v2:/usr/src/app
+    - ${HOME}/.m2:/root/.m2
+    working_dir: /usr/src/app
+    depends_on:
+    - kafka
+    links:
+    - kafka:kafka
