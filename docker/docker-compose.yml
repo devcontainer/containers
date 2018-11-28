@@ -69,7 +69,7 @@ services:
     hostname: dap-data
     container_name: dap-data
     volumes:
-      - ${HOME}/workspace/github.build.ge.com/Digital-Asset-Passport/dap-containerized/packages/dap-data:/usr/src/app
+      - ${SERVICE_HOST_DIR}:/usr/src/app
       - ${HOME}/.m2:/root/.m2
     working_dir: /usr/src/app
     depends_on:
@@ -109,7 +109,7 @@ services:
       - ../environment/docker/.default.env
       - ../environment/docker/.${ENV}.env
     volumes:
-      - ../:${APP_DIR}
+      - ${SERVICE_HOST_DIR}/:${APP_DIR}
       - ${HOME}/workspace:/usr/src/workspace
       - ${HOME}/.aws/credentials:/root/.aws/credentials
       - ${HOME}/.local/lib/python3.7/site-packages/certifi:/root/.local/lib/python3.7/site-packages/certifi
@@ -118,3 +118,34 @@ services:
       - ${HOME}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
       - /var/run/docker.sock:/var/run/docker.sock
     working_dir: ${APP_DIR}
+
+  # dap-spring:
+  #   container_name: dap-spring
+  #   image: maven:3.5.2-jdk-8-slim
+  #   command: >
+  #     sh -c "ls; mvn clean install; mvn spring-boot:run"
+  #   volumes:
+  #     - ${HOME}/Spring-Kafka-ProducerConsumer:/usr/src/app
+  #     - ${HOME}/.m2:/root/.m2
+  #   working_dir: /usr/src/app
+  #   depends_on:
+  #     - kafka
+
+
+  dap-notification-service:
+    container_name: dap-notification-service
+    image: maven:3.5.2-jdk-8-slim
+    command: >
+      sh -c "mvn spring-boot:run"
+    env_file:
+      - ../environment/docker/.default.env
+      - ../environment/docker/.${ENV}.env
+      - ../environment/dap-notification-service/.default.env
+    volumes:
+      - ${SERVICE_HOST_DIR}:/usr/src/app
+      - ${HOME}/.m2:/root/.m2
+    working_dir: /usr/src/app
+    depends_on:
+      - kafka
+    links:
+      - kafka:kafka

@@ -1,6 +1,6 @@
 # DAP Dockerization
 
-- Install Docker
+- Install Docker, yq, and jq
 - Run `./scripts/start.sh up`
 - Start Postgres connector
   ```
@@ -15,6 +15,9 @@
 - To restart a container without rebuilding `ENV=dev docker-compose -f ./docker/docker-compose.yml restart <container_name>`, replace `<container_name>` with container service you want to restart
 - To view container logs `ENV=dev docker-compose -f ./docker/docker-compose.yml logs -f <container_name>`
 - Login to a container `docker exec -it <container_name> zsh`, if `zsh` doesn't exists use `bash` or `sh`
+- Run `./scripts/start.sh config` to see how docker compose file gets evaluated.
+- Run `./scripts/start.sh config <container_name_1> <container_name_2>` to see config of service `container_name_1` and `container_name_2`
+- Run `./scripts/start.sh down` for cleanup
 
 ## Troubleshooting
 

@@ -25,11 +25,10 @@ function up () {
   local unavailableServices=();
   if [ $# -eq 0 ]; then
     services=$(yq r ${ROOT_DIR}/docker/docker-compose.yml -j | jq -c '.services | keys' | echo $@)
-    echo "Starting ${services:-all services}"
     docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml config
     docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml down --remove-orphans
     # docker-compose --file ${ROOT_DIR}/docker/docker-compose.yml --project-name ${PROJECT_NAME:-$(basename ${PWD%/*})} up --build
-    docker-compose --file ${ROOT_DIR}/docker/docker-compose.yml up --build -d
+    docker-compose --file ${ROOT_DIR}/docker/docker-compose.yml up --build
   else
     for i in $@; do
       if [ $(yq r ${ROOT_DIR}/docker/docker-compose.yml -j | jq ".services | has(\"${i}\")") = "true" ]; then
@@ -44,12 +43,39 @@ function up () {
     if [ ${#services[@]} -gt 0 ]; then
       docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml stop ${services[@]};
       docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml rm -f ${services[@]};
-      docker-compose --file ${ROOT_DIR}/docker/docker-compose.yml up --build -d ${services[@]};
+      docker-compose --file ${ROOT_DIR}/docker/docker-compose.yml up --build ${services[@]};
+    fi;
+  fi;
+}
+
+# Prints docker-compose config after evalutating all environment variables can be 
+# provided space seperated services to specifically print config of those services
+function config() {
+  local services=();
+  local unavailableServices=();
+  if [ $# -eq 0 ]; then
+    docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml config
+  else
+    for i in $@; do
+      if [ $(yq r ${ROOT_DIR}/docker/docker-compose.yml -j | jq ".services | has(\"${i}\")") = "true" ]; then
+        services+=("${i}");
+      else 
+        unavailableServices+=("${i}");
+      fi;
+    done;
+    if [ ${#unavailableServices[@]} -gt 0 ]; then 
+      echo "Services not defined in compose file: ${unavailableServices[@]}";
+    fi;
+    if [ ${#services[@]} -gt 0 ]; then
+      docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml config | \
+        yq r - 'services' -j | \
+        jq "{services: {$(echo ${services[@]} | sed -e '/\([^ ]\+\)/ s//\1: .\1,/g' -e '/,$/ s///g')}}" | \
+        python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)'
     fi;
   fi;
 }
 
 function down() {
-    docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml down --remove-orphans
+    docker-compose -f ${ROOT_DIR}/docker/docker-compose.yml down --remove-orphans;
 }
 "$@"
