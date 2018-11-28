@@ -89,24 +89,32 @@ services:
     #   driver: "none"
 
   sbx:
-    image: ashtr/fe-devbox:carbon-alpine
+    image: ashtr/devbox:ami
     hostname: sbx
     container_name: sbx
-    command: tail -f /dev/null
+    command: '
+      zsh -c "
+      mkdir -p /root/.local/lib/python3.7/site-packages/certifi/;
+      if [ ! -d /usr/src/workspace/gaws ]; then 
+        git clone git@github.build.ge.com:healthcloud/gaws.git /usr/src/workspace/gaws;
+      fi;
+      if ! type gaws >/dev/null 2>&1; then
+        echo \"\nalias gaws=\\\"python3 /usr/src/workspace/gaws/gaws.py\\\"\" >> ~/.bash_extras;
+      fi;
+      echo -e \"SBX Box is ready now\";
+      tail -f /dev/null;
+      "
+    '
     env_file:
       - ../environment/docker/.default.env
       - ../environment/docker/.${ENV}.env
     volumes:
       - ../:${APP_DIR}
+      - ${HOME}/workspace:/usr/src/workspace
+      - ${HOME}/.aws/credentials:/root/.aws/credentials
+      - ${HOME}/.local/lib/python3.7/site-packages/certifi:/root/.local/lib/python3.7/site-packages/certifi
+      - ${HOME}/.ssh/known_hosts:/root/.ssh/known_hosts
+      - ${HOME}/.ssh/id_rsa:/root/.ssh/id_rsa
+      - ${HOME}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
+      - /var/run/docker.sock:/var/run/docker.sock
     working_dir: ${APP_DIR}
-  # dap-spring:
-  #   container_name: dap-spring
-  #   image: maven:3.5.2-jdk-8-slim
-  #   command: >
-  #     sh -c "ls; mvn clean install; mvn spring-boot:run"
-  #   volumes:
-  #     - ${HOME}/Spring-Kafka-ProducerConsumer:/usr/src/app
-  #     - ${HOME}/.m2:/root/.m2
-  #   working_dir: /usr/src/app
-  #   depends_on:
-  #     - kafka
