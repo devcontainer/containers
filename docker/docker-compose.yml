@@ -95,28 +95,34 @@ services:
     command: '
       zsh -c "
       mkdir -p /root/.local/lib/python3.7/site-packages/certifi/;
-      if [ ! -d /usr/src/workspace/gaws ]; then 
-        git clone git@github.build.ge.com:healthcloud/gaws.git /usr/src/workspace/gaws;
+      if [ ! -d /go/src/github.build.ge.com/gaws ]; then 
+        mkdir -p /go/src/github.build.ge.com/gaws;
+        git clone git@github.build.ge.com:healthcloud/gaws.git /go/src/github.build.ge.com/gaws;
       fi;
       if ! type gaws >/dev/null 2>&1; then
-        echo \"\nalias gaws=\\\"python3 /usr/src/workspace/gaws/gaws.py\\\"\" >> ~/.bash_extras;
+        echo \"\nalias gaws=\\\"python3 /go/src/github.build.ge.com/gaws/gaws.py\\\"\" >> ~/.bash_extras;
       fi;
       echo -e \"SBX Box is ready now\";
       tail -f /dev/null;
       "
     '
+    environment:
+      REPO_GO_SRC_PATH: "github.com/beanstalk-test/go-server-server"
     env_file:
       - ../environment/docker/.default.env
       - ../environment/docker/.${ENV}.env
     volumes:
-      - ${SERVICE_HOST_DIR}/:${APP_DIR}
-      - ${HOME}/workspace:/usr/src/workspace
-      - ${HOME}/.aws/credentials:/root/.aws/credentials
+      - ${HOME}/.m2:/root/.m2
+      - ${HOME}/go:/go
+      - ${HOME}/workspace:/go/src
+      - ${HOME}/.aws:/root/.aws
       - ${HOME}/.local/lib/python3.7/site-packages/certifi:/root/.local/lib/python3.7/site-packages/certifi
       - ${HOME}/.ssh/known_hosts:/root/.ssh/known_hosts
       - ${HOME}/.ssh/id_rsa:/root/.ssh/id_rsa
       - ${HOME}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
+      - ${HOME}/.docker:/root/.docker
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${SERVICE_HOST_DIR}/:${APP_DIR}
     working_dir: ${APP_DIR}
 
   # dap-spring:
