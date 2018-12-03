@@ -1,6 +1,9 @@
 FROM maven:3.5.2-jdk-8-slim AS BUILD_IMAGE
+ARG ENV=${ENV:-dev}
+ENV ENV=${ENV:-dev}
 WORKDIR /usr/src/app
 COPY . .
+COPY ./.${ENV}.env .env
 RUN mvn clean install;
 
 ###############################################################################
@@ -37,7 +40,7 @@ LABEL uai=${UAI} \
   AUTHOR="Ashish Gupta <ashish.gupta5@ge.com>"
 
 WORKDIR /root/
-RUN env;
 COPY --from=BUILD_IMAGE /usr/src/app/target/${SERVICE_NAME}-${SERVICE_VERSION}.jar ${SERVICE_NAME}-${SERVICE_VERSION}.jar
+COPY --from=BUILD_IMAGE /usr/src/app/.env .env
 EXPOSE 8080
 CMD java -jar ${SERVICE_NAME}-${SERVICE_VERSION}.jar

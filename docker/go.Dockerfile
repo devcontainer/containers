@@ -1,9 +1,12 @@
 FROM golang:1.9 as BUILD_IMAGE
 
+ARG ENV=${ENV:-dev}
 ARG REPO_GO_SRC_PATH=${REPO_GO_SRC_PATH:-abracadabara}
+ENV ENV=${ENV:-dev}
 ENV PATH=${GOPATH}/bin:${PATH}
 WORKDIR /${REPO_GO_SRC_PATH}
 COPY . .
+COPY ./.${ENV}.env .env
 RUN go get -d -v;
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app .
 

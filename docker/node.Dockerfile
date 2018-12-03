@@ -1,4 +1,6 @@
-FROM node:8-alpine AS BUILD_STAGE
+FROM node:8-alpine AS BUILD_IMAGE
+ARG ENV=${ENV:-dev}
+ENV ENV=${ENV:-dev}
 
 WORKDIR /usr/src/app
 
@@ -9,6 +11,8 @@ RUN yarn install --production
 COPY . .
 
 RUN bower install --allow-root --production
+
+COPY ./.${ENV}.env .env
 
 RUN ./node_modules/.bin/gulp dist
 
@@ -34,7 +38,8 @@ ENV logger_level=${ENABLE_NEWRELIC_MONITORING:-info}
 
 WORKDIR /usr/src/app
 
-COPY --from=BUILD_STAGE /usr/src/app/dist /usr/src/app
+COPY --from=BUILD_IMAGE /usr/src/app/dist /usr/src/app
+COPY --from=BUILD_IMAGE /usr/src/app/.env .env
 
 EXPOSE ${VCAP_APP_PORT}
 
