@@ -117,6 +117,7 @@ services:
       - ${HOME}/workspace:/go/src
       - ${HOME}/.aws:/root/.aws
       - ${HOME}/.local/lib/python3.7/site-packages/certifi:/root/.local/lib/python3.7/site-packages/certifi
+      - ${HOME}/.ssh:/root/.ssh
       - ${HOME}/.ssh/known_hosts:/root/.ssh/known_hosts
       - ${HOME}/.ssh/id_rsa:/root/.ssh/id_rsa
       - ${HOME}/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub

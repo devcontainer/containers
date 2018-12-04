@@ -1,4 +1,4 @@
-FROM node:8-alpine AS BUILD_IMAGE
+FROM ashtr/devbox:ami AS BUILD_IMAGE
 ARG ENV=${ENV:-dev}
 ENV ENV=${ENV:-dev}
 
@@ -6,11 +6,28 @@ WORKDIR /usr/src/app
 
 COPY package.json .
 
-RUN yarn install --production
+RUN set -ex; \
+  if [ ! -z ${HTTP_PROXY} ] && type yarn >/dev/null 2>&1; then \
+  echo "Setting Proxy to ${HTTP_PROXY}"; \
+  yarn config set proxy ${HTTP_PROXY}; \
+  yarn config set https-proxy ${HTTP_PROXY}; \
+  yarn config set strict-ssl false ; \
+  npm config set proxy ${HTTP_PROXY}; \
+  npm config set https-proxy ${HTTP_PROXY}; \
+  npm config set http-proxy ${HTTP_PROXY}; \
+  fi; \
+  yarn install --production
 
 COPY . .
 
-RUN bower install --allow-root --production
+RUN set -eux;\
+  if [ ! -z ${HTTPS_PROXY} ]; then \
+  if [ ! -f ./.bowerrc ]; then \
+  echo '{}' > ./.bowerrc; \
+  fi;\
+  jq --argjson obj "{ \"proxy\": \"${HTTP_PROXY}\", \"https-proxy\": \"${HTTP_PROXY}\", \"strict-ssl\": false }" '. + $obj' < ./.bowerrc > temp && mv temp ./.bowerrc; \
+  fi; \
+  bower install --allow-root --production
 
 COPY ./.${ENV}.env .env
 
