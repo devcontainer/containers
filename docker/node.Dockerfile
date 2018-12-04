@@ -16,7 +16,8 @@ RUN set -ex; \
   npm config set https-proxy ${HTTP_PROXY}; \
   npm config set http-proxy ${HTTP_PROXY}; \
   fi; \
-  yarn install --production
+  yarn install
+ENV PATH=/usr/src/app/node_modules/.bin:/node_modules/.bin:$PATH
 
 COPY . .
 
@@ -29,9 +30,7 @@ RUN set -eux;\
   fi; \
   bower install --allow-root --production
 
-COPY ./.${ENV}.env .env
-
-RUN ./node_modules/.bin/gulp dist
+RUN gulp dist
 
 ################################################################################
 
@@ -56,7 +55,6 @@ ENV logger_level=${ENABLE_NEWRELIC_MONITORING}
 WORKDIR /usr/src/app
 
 COPY --from=BUILD_IMAGE /usr/src/app/dist /usr/src/app
-COPY --from=BUILD_IMAGE /usr/src/app/.env .env
 
 EXPOSE ${VCAP_APP_PORT}
 

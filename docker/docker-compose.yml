@@ -138,6 +138,35 @@ services:
   #   depends_on:
   #     - kafka
 
+  dap-audit-service:
+    image: 846018127931.dkr.ecr.us-east-1.amazonaws.com/dap/dap-audit-service:latest
+    hostname: dap-audit-service 
+    container_name: dap-audit-service
+    ports:
+      - 9000:8080
+    environment:
+      DEPLOY_ENV: dap-dev
+      POSTGRES_SERVICE_NAME: postgres-2.0
+      POSTGRES_SERVICE_INSTANCE_NAME: dap-postgres
+      SCHEMA: public,dap_stg
+      UAA_HOST: https://27026fbc-a745-437f-906f-31fdcc86c8b2.predix-uaa.run.aws-usw02-pr.ice.predix.io
+      CLIENT_CREDENTIALS: akRzSFRnWWJWdjpKQkl2MVRncWxTazJCZmVGb3p2c1hxQlI=
+      TOKEN_VALIDATION: "true"
+      UMTM_URL: https://umtm-services-dev.run.aws-usw02-pr.ice.predix.io
+      UMTM_UAA_URL: https://27026fbc-a745-437f-906f-31fdcc86c8b2.predix-uaa.run.aws-usw02-pr.ice.predix.io
+      UMTM_CLIENT_ID: jDsHTgYbVv
+      UMTM_CLIENT_SECRET: JBIv1TgqlSk2BfeFozvsXqBR
+      UMTM_SERVICES_CLIENT_ID: jDsHTgYbVv
+      UMTM_SERVICES_CLIENT_SECRET: JBIv1TgqlSk2BfeFozvsXqBR
+      UMTM_CLIENT_CREDENTIALS: akRzSFRnWWJWdjpKQkl2MVRncWxTazJCZmVGb3p2c1hxQlI=
+      UMTM_TENANT_HEADER: tenant-id
+      NEW_RELIC_APP_NAME: dap-audit-service-dev
+      DB_URL: daptestdb.cy3ryebkcisz.us-east-1.rds.amazonaws.com
+      DB_USER_NAME: dapadmin123
+      DB_PASSWORD: dapadmin123
+      DB_PORT: 5432
+      DB_NAME: DAPTESTDB
+
 
   dap-notification-service:
     container_name: dap-notification-service
