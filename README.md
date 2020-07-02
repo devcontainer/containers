@@ -29,9 +29,9 @@
   {
     "proxies" : {
       "default" : {
-        "httpsProxy" : "http://PITC-Zscaler-ASPAC-Bangalore3PR.proxy.corporate.ge.com:80",
-        "httpProxy" : "http://PITC-Zscaler-ASPAC-Bangalore3PR.proxy.corporate.ge.com:80",
-        "noProxy" : "*.ge.com,*.zeplin.io,*.zpl.io,https://index.docker.io/v1/,127.0.0.1,localhost,openge.com,*.openge.ge.com,*.github.build.ge.com,*.predix.io"
+        "httpsProxy" : "",
+        "httpProxy" : "",
+        "noProxy" : ""
       }
     },
     ...
